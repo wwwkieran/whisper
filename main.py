@@ -1,18 +1,90 @@
 import base64
+import os
+import time
+import cv2
+import mediapipe as mp
 from openai import OpenAI
 from pathlib import Path
-
+from playsound import playsound
 client = OpenAI()
 
 def encode_image(image_path):
     with open(image_path, "rb") as image_file:
         return base64.b64encode(image_file.read()).decode('utf-8')
 
+# Crear la carpeta 'photos' si no existe
+photos_dir = 'images'
+if not os.path.exists(photos_dir):
+    os.makedirs(photos_dir)
+    print(f"Carpeta '{photos_dir}' creada.")
+# Inicializar MediaPipe Face Detection
+mp_face_detection = mp.solutions.face_detection
+face_detection = mp_face_detection.FaceDetection(model_selection=1, min_detection_confidence=0.5)
+# Iniciar la captura de video
+cap = cv2.VideoCapture(0)
+if not cap.isOpened():
+    print("No se pudo abrir la cámara.")
+print("Cámara abierta. Buscando caras...")
+face_detected_time = None
+face_present = False
+while True:
+    ret, frame = cap.read()
+    if not ret:
+        print("No se pudo leer el frame de la cámara.")
+        break
+    # Convertir la imagen a RGB (MediaPipe usa RGB)
+    rgb_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+    # Procesar la imagen con MediaPipe
+    results = face_detection.process(rgb_frame)
+    # Verificar si se detectaron caras
+    if results.detections:
+        for detection in results.detections:
+            # Obtener las coordenadas del bounding box
+            bboxC = detection.location_data.relative_bounding_box
+            h, w, c = frame.shape
+            x1 = int(bboxC.xmin * w)
+            y1 = int(bboxC.ymin * h)
+            x2 = int((bboxC.xmin + bboxC.width) * w)
+            y2 = int((bboxC.ymin + bboxC.height) * h)
+            # Dibujar el rectángulo alrededor de la cara
+            cv2.rectangle(frame, (x1, y1), (x2, y2), (0, 255, 0), 2)
+        if not face_present:
+            # Cara detectada por primera vez
+            face_present = True
+            face_detected_time = time.time()
+            print("Cara detectada. Esperando 5 segundos...")
+        else:
+            # Verificar cuánto tiempo ha estado presente la cara
+            elapsed_time = time.time() - face_detected_time
+            if elapsed_time >= 5:
+                # Guardar la foto
+                timestamp = time.strftime("%Y%m%d-%H%M%S")
+                photo_path = os.path.join(photos_dir, f"foto_{timestamp}.jpg")
+                cv2.imwrite(photo_path, frame)
+                print(f"Foto guardada en {photo_path}")
+                break
+    else:
+        if face_present:
+            # Cara ya no está presente
+            print("Cara ya no está presente.")
+        face_present = False
+        face_detected_time = None
+    # Mostrar el frame con las detecciones
+    cv2.imshow('Detección de Rostros', frame)
+    # Salir con la tecla 'q'
+    if cv2.waitKey(1) & 0xFF == ord('q'):
+        print("Terminando el programa.")
+        break
+# Liberar la cámara y cerrar ventanas
+cap.release()
+cv2.destroyAllWindows()
+print("Cámara cerrada.")
+
 # Path to your image
 image_path = "./images/photo1.jpg"
 
 # Getting the base64 string
-base64_image = encode_image(image_path)
+base64_image = encode_image(photo_path)
 
 completion = client.chat.completions.create(
     model="gpt-4o-mini",
@@ -41,6 +113,8 @@ response = client.audio.speech.create(
   input=completion.choices[0].message.content
 )
 response.stream_to_file(speech_file_path)
+playsound(speech_file_path)
+
 
 completion = client.chat.completions.create(
     model="gpt-4o-mini",
@@ -62,6 +136,7 @@ response = client.audio.speech.create(
   input=completion.choices[0].message.content
 )
 response.stream_to_file(speech_file_path)
+playsound(speech_file_path)
 
 completion = client.chat.completions.create(
     model="gpt-4o-mini",
@@ -83,6 +158,7 @@ response = client.audio.speech.create(
   input=completion.choices[0].message.content
 )
 response.stream_to_file(speech_file_path)
+playsound(speech_file_path)
 
 completion = client.chat.completions.create(
     model="gpt-4o-mini",
@@ -104,3 +180,4 @@ response = client.audio.speech.create(
   input=completion.choices[0].message.content
 )
 response.stream_to_file(speech_file_path)
+playsound(speech_file_path)
