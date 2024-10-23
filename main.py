@@ -1,5 +1,6 @@
 import base64
 from openai import OpenAI
+from pathlib import Path
 
 client = OpenAI()
 
@@ -33,6 +34,13 @@ completion = client.chat.completions.create(
 
 print("Claire")
 print(completion.choices[0].message.content)
+speech_file_path = Path(__file__).parent / "out/Claire.mp3"
+response = client.audio.speech.create(
+  model="tts-1",
+  voice="nova",
+  input=completion.choices[0].message.content
+)
+response.stream_to_file(speech_file_path)
 
 completion = client.chat.completions.create(
     model="gpt-4o-mini",
@@ -47,6 +55,13 @@ completion = client.chat.completions.create(
 
 print("Brian")
 print(completion.choices[0].message.content)
+speech_file_path = Path(__file__).parent / "out/Brian.mp3"
+response = client.audio.speech.create(
+  model="tts-1",
+  voice="echo",
+  input=completion.choices[0].message.content
+)
+response.stream_to_file(speech_file_path)
 
 completion = client.chat.completions.create(
     model="gpt-4o-mini",
@@ -61,6 +76,13 @@ completion = client.chat.completions.create(
 
 print("Andrew")
 print(completion.choices[0].message.content)
+speech_file_path = Path(__file__).parent / "out/Andrew.mp3"
+response = client.audio.speech.create(
+  model="tts-1",
+  voice="fable",
+  input=completion.choices[0].message.content
+)
+response.stream_to_file(speech_file_path)
 
 completion = client.chat.completions.create(
     model="gpt-4o-mini",
@@ -75,3 +97,10 @@ completion = client.chat.completions.create(
 
 print("Allison")
 print(completion.choices[0].message.content)
+speech_file_path = Path(__file__).parent / "out/Allison.mp3"
+response = client.audio.speech.create(
+  model="tts-1",
+  voice="shimmer",
+  input=completion.choices[0].message.content
+)
+response.stream_to_file(speech_file_path)
