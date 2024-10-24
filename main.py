@@ -23,7 +23,7 @@ if not os.path.exists(photos_dir):
     print(f"Carpeta '{photos_dir}' creada.")
 # Inicializar MediaPipe Face Detection
 mp_face_detection = mp.solutions.face_detection
-face_detection = mp_face_detection.FaceDetection(model_selection=1, min_detection_confidence=0.5)
+face_detection = mp_face_detection.FaceDetection(model_selection=1, min_detection_confidence=0.4)
 # Iniciar la captura de video
 cap = cv2.VideoCapture(0)
 if not cap.isOpened():
@@ -115,17 +115,17 @@ personas = [
 numIterations = 6
 firstPrompt = "You must make fun of the person described."
 prompts = [
-    "Defend the person, say something nice about them.",
+    "Defend the person, say something nice about them... but don't try too hard.",
     "Use something in the image to make up a crazy rumor.",
     "Make up a nickname for the person in the image based on something in the picture. If a nickname has already been made up, use it to insult the person.",
     "Continue making fun of the person and share a rumor about them.",
-    "Defend the person and say a good experience you had with them in class at Harvard.",
+    "Defend the person and say a good experience you had with them in class at Harvard. Then still make fun of them for something.",
 ]
 lengths = [
-    "Create one short sentence."
-    "Create one long sentence."
+    "Create one short sentence ONLY."
+    "Create one long sentence ONLY."
     "Create no more than 2 sentences."
-    "Create no more than 3 sentences."
+    # "Create no more than 3 sentences."
     "Create no more than 3 short sentences."
 ]
 prevMessage = ""
