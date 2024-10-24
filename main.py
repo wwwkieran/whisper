@@ -2,6 +2,8 @@ import base64
 import os
 import threading
 import time
+from datetime import datetime
+
 import cv2
 import mediapipe as mp
 from openai import OpenAI
@@ -110,9 +112,12 @@ personas = [
      Person("Allison",
             "You are Allison. Allison observes the subtle, unusual details, valuing individuality and nonconformity. She judges based on how unique or quirky someone seems, looking for little hints of rebellion, such as mismatched clothing, eccentric accessories, or a distinct hairstyle. An unconventional style signifies authenticity and depth, while a polished, conventional appearance might be seen as fake or superficial.",
             "shimmer"),
+     Person("Johnson",
+            "You are Johnson. You are mean intellectual professor. You are smarter than anyone. You like making rumors of people failing at their professional careers. ",
+            "fable"),
 ]
 
-numIterations = random.randint(1, 6)
+numIterations = random.randint(4, 6)
 firstPrompt = "You must make fun of the person described. Be as specific as possible. Feel free to focus on one particular aspect. "
 prompts = [
     "Defend the person, say something nice about them... but don't try too hard.",
@@ -123,8 +128,10 @@ prompts = [
     "Explain which part of their hair most looks like a dog.",
     "Tell a story about how terrible a date with this person must be.",
     "Spread a rumor that you heard from a friend about how this person asked your friend out.",
-    "Choose a family member who would be most likely to wear this person's outfit.",
-    "Speculate about what this person likes to eat.",
+    "Choose a famous person who looks alike this person.",
+    "Speculate about what this person likes to do on its free time.",
+    "Speculate about why this person is taking Enactive Design classes at Harvard GSD",
+    "Reflect on whether gossiping about people is the right thing to do.",
 ]
 lengths = [
     "Create one short sentence ONLY."
@@ -140,7 +147,7 @@ def playSounds(file_path):
     playsound(file_path)
 
 thread = None
-
+ft = "%Y-%m-%dT%H:%M:%S%z"
 
 for i in range(numIterations):
     while person.name == prevPerson:
@@ -150,7 +157,7 @@ for i in range(numIterations):
     completion = client.chat.completions.create(
         model="gpt-4o-mini",
         messages=[
-            {"role": "system", "content": " ".join(["You are gossiping privately with your friends. Respond directly to the latest message which is about the person in the photo.", prompt, person.description, length])},
+            {"role": "system", "content": " ".join(["You are gossiping privately with your friends. Respond directly to the latest message which is about the person in the photo. You can challenge others ideas. You are a Harvard GSD student.", prompt, person.description, length])},
             {
                 "role": "user",
                 "content": [
@@ -171,7 +178,7 @@ for i in range(numIterations):
 
     print(person.name)
     print(completion.choices[0].message.content)
-    speech_file_path = Path(__file__).parent / "out" / (person.name + ".mp3")
+    speech_file_path = Path(__file__).parent / "out" / (person.name + datetime.now().strftime(ft) + ".mp3")
     response = client.audio.speech.create(
         model="tts-1",
         voice=person.voice,
