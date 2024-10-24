@@ -112,14 +112,19 @@ personas = [
             "shimmer"),
 ]
 
-numIterations = 6
-firstPrompt = "You must make fun of the person described."
+numIterations = random.randint(1, 6)
+firstPrompt = "You must make fun of the person described. Be as specific as possible. Feel free to focus on one particular aspect. "
 prompts = [
     "Defend the person, say something nice about them... but don't try too hard.",
     "Use something in the image to make up a crazy rumor.",
     "Make up a nickname for the person in the image based on something in the picture. If a nickname has already been made up, use it to insult the person.",
     "Continue making fun of the person and share a rumor about them.",
     "Defend the person and say a good experience you had with them in class at Harvard. Then still make fun of them for something.",
+    "Explain which part of their hair most looks like a dog.",
+    "Tell a story about how terrible a date with this person must be.",
+    "Spread a rumor that you heard from a friend about how this person asked your friend out.",
+    "Choose a family member who would be most likely to wear this person's outfit.",
+    "Speculate about what this person likes to eat.",
 ]
 lengths = [
     "Create one short sentence ONLY."
@@ -179,5 +184,6 @@ for i in range(numIterations):
     if i > 0:
         thread.join()
     thread = threading.Thread(target=playSounds, args=(speech_file_path,))
+    time.sleep(1)
     thread.start()
 
