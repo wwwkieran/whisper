@@ -1,5 +1,6 @@
 import base64
 import os
+import threading
 import time
 import cv2
 import mediapipe as mp
@@ -130,6 +131,11 @@ lengths = [
 prevMessage = ""
 prevPerson = ""
 person = random.choice(personas)
+def playSounds(file_path):
+    playsound(file_path)
+
+thread = None
+
 
 for i in range(numIterations):
     while person.name == prevPerson:
@@ -168,6 +174,10 @@ for i in range(numIterations):
         input=completion.choices[0].message.content
     )
     response.stream_to_file(speech_file_path)
-    playsound(speech_file_path)
     prevMessage = completion.choices[0].message.content
     prevPerson = person.name
+    if i > 0:
+        thread.join()
+    thread = threading.Thread(target=playSounds, args=(speech_file_path,))
+    thread.start()
+
