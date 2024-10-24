@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Whispers Web Environment</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+</head>
+<body>
+    <div id="container">
+        <div id="shiny-dot"></div>
+        <div id="camera-container">
+            <video id="video" autoplay playsinline></video>
+        </div>
+    </div>
+
+    <audio id="audio-player" src="" hidden></audio>
+
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+</body>
+</html>

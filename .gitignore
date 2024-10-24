@@ -1,3 +1,5 @@
 .idea/
 images
 out
+venv
+.DS_Store
